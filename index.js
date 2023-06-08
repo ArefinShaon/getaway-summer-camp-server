@@ -8,7 +8,7 @@ require("dotenv").config();
 app.use(cors());
 app.use(express.json());
 
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.wt96dtg.mongodb.net/?retryWrites=true&w=majority`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -60,7 +60,6 @@ async function run() {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const options = {
-        
         projection: {
           email: 1,
           price: 1,
@@ -69,13 +68,18 @@ async function run() {
           name: 1,
           availableSeats: 1,
           selected: 1,
-        
         },
       };
-
-      const result = await userCollection.findOne(query, options);
-      res.send(result);
+    
+      try {
+        const result = await userCollection.findOne(query, options);
+        res.send(result);
+      } catch (error) {
+        console.error("Error retrieving user:", error);
+        res.status(500).send("Error retrieving user");
+      }
     });
+    
 
     // Post Data
     app.post("/users", async (req, res) => {
@@ -85,13 +89,13 @@ async function run() {
     });
 
 
-        DElete
-        app.delete("/users/:id", async (req, res) => {
-          const id = req.params.id;
-          const query = { _id: new ObjectId(id) };
-          const result = await userCollection.deleteOne(query);
-          res.send(result);
-        });
+        // DElete
+        // app.delete("/users/:id", async (req, res) => {
+        //   const id = req.params.id;
+        //   const query = { _id: new ObjectId(id) };
+        //   const result = await userCollection.deleteOne(query);
+        //   res.send(result);
+        // });
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
