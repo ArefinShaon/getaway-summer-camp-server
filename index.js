@@ -28,11 +28,59 @@ async function run() {
     await client.connect();
 
     const classCollection = client.db("summerCamp").collection("user");
+    const userCollection = client.db("summerCamp").collection("users");
 
     app.get('/class', async(req, res) =>{
         const result = await classCollection.find().toArray();
         res.send(result);
     })
+    app.get('/users', async (req, res) => {
+      const { email, selected } = req.query;
+      let query = {};
+      
+      if (email && selected) {
+        query = { email: email, selected: true };
+        console.log(query);
+      } else if (email) {
+        query = { email: email };
+      }
+      
+      try {
+        const result = await userCollection.find(query).toArray();
+        res.send(result);
+      } catch (error) {
+        console.error(error);
+        res.status(500).send("Internal Server Error");
+      }
+    });
+    
+
+    // Post Data
+    app.post("/users", async (req, res) => {
+        const student = req.body;
+        const result = await userCollection.insertOne(student);
+        res.send(result);
+      })
+
+    
+    
+      // app.get("/users/:id", async (req, res) => {
+      //   const id = req.params.id;
+      //   const query = { _id: new ObjectId(id) };
+      //   const options = {
+      //     projection: {
+      //       userId: 1,
+      //       image: 1,
+      //       price: 1,
+      //       availableSeats: 1,
+      //       name: 1,
+      //     },
+      //   };
+  
+      //   const result = await userCollection.findOne(query, options);
+      //   res.send(result);
+      // });
+    
 
 
 
