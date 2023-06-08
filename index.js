@@ -55,6 +55,28 @@ async function run() {
       }
     });
 
+
+    app.get("/users/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const options = {
+        
+        projection: {
+          email: 1,
+          price: 1,
+          userId: 1,
+          image: 1,
+          name: 1,
+          availableSeats: 1,
+          selected: 1,
+        
+        },
+      };
+
+      const result = await userCollection.findOne(query, options);
+      res.send(result);
+    });
+
     // Post Data
     app.post("/users", async (req, res) => {
       const student = req.body;
@@ -62,13 +84,14 @@ async function run() {
       res.send(result);
     });
 
-        // DElete
+
+        DElete
         app.delete("/users/:id", async (req, res) => {
           const id = req.params.id;
-          const query = { _id: new ObjectId(id) }
-          const result = await use.deleteOne(query);
+          const query = { _id: new ObjectId(id) };
+          const result = await userCollection.deleteOne(query);
           res.send(result);
-      })
+        });
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
