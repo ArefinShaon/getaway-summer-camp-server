@@ -8,9 +8,7 @@ require("dotenv").config();
 app.use(cors());
 app.use(express.json());
 
-
-
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion } = require("mongodb");
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.wt96dtg.mongodb.net/?retryWrites=true&w=majority`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -19,7 +17,7 @@ const client = new MongoClient(uri, {
     version: ServerApiVersion.v1,
     strict: true,
     deprecationErrors: true,
-  }
+  },
 });
 
 async function run() {
@@ -30,21 +28,24 @@ async function run() {
     const classCollection = client.db("summerCamp").collection("user");
     const userCollection = client.db("summerCamp").collection("users");
 
-    app.get('/class', async(req, res) =>{
-        const result = await classCollection.find().toArray();
-        res.send(result);
-    })
-    app.get('/users', async (req, res) => {
+    // Get Data
+    app.get("/class", async (req, res) => {
+      const result = await classCollection.find().toArray();
+      res.send(result);
+    });
+
+    // Get Data
+    app.get("/users", async (req, res) => {
       const { email, selected } = req.query;
       let query = {};
-      
+
       if (email && selected) {
         query = { email: email, selected: true };
         console.log(query);
       } else if (email) {
         query = { email: email };
       }
-      
+
       try {
         const result = await userCollection.find(query).toArray();
         res.send(result);
@@ -53,40 +54,19 @@ async function run() {
         res.status(500).send("Internal Server Error");
       }
     });
-    
 
     // Post Data
     app.post("/users", async (req, res) => {
-        const student = req.body;
-        const result = await userCollection.insertOne(student);
-        res.send(result);
-      })
-
-    
-    
-      // app.get("/users/:id", async (req, res) => {
-      //   const id = req.params.id;
-      //   const query = { _id: new ObjectId(id) };
-      //   const options = {
-      //     projection: {
-      //       userId: 1,
-      //       image: 1,
-      //       price: 1,
-      //       availableSeats: 1,
-      //       name: 1,
-      //     },
-      //   };
-  
-      //   const result = await userCollection.findOne(query, options);
-      //   res.send(result);
-      // });
-    
-
-
+      const student = req.body;
+      const result = await userCollection.insertOne(student);
+      res.send(result);
+    });
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
-    console.log("Pinged your deployment. You successfully connected to MongoDB!");
+    console.log(
+      "Pinged your deployment. You successfully connected to MongoDB!"
+    );
   } finally {
     // Ensures that the client will close when you finish/error
     // await client.close();
@@ -94,14 +74,10 @@ async function run() {
 }
 run().catch(console.dir);
 
-
-
-
-
 app.get("/", (req, res) => {
-    res.send("server is running bro");
-  });
-  
-  app.listen(port, () => {
-    console.log(` Server is running on port ${port}`);
-  });
+  res.send("server is running bro");
+});
+
+app.listen(port, () => {
+  console.log(` Server is running on port ${port}`);
+});
